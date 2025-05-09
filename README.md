@@ -17,13 +17,22 @@ A web-based **Library Management System** built with **Django**, **HTML**, and *
 - **Database**: SQLite ORM (default with Django)
 
 ## 📷 Screenshots
-![Login Page Screenshot](Screenshots/Screenshot 1.png)
-
-*Add screenshots of the homepage, book list, and admin dashboard here.*
+  ## Login page
+![Login Page Screenshot](Screenshots/Screenshot%201.png)
+  ## Home page
+![Login Page Screenshot](Screenshots/Screenshot%202.png)
+  ## Add book page
+![Login Page Screenshot](Screenshots/Screenshot%203.png)
+  ## Add student page
+![Login Page Screenshot](Screenshots/Screenshot%204.png)
+  ## Borrow Book
+![Login Page Screenshot](Screenshots/Screenshot%205.png) 
+  ## Borrow info 
+![Login Page Screenshot](Screenshots/Screenshot%206.png)  
 
 ## ⚙️ Installation & Setup
-
  After download zip and extract zip in some folder ,now go to vs code and open terminal then for this step
+ 
  ## Install dependencies
     pip install django
  ## Apply migrations
@@ -32,3 +41,6 @@ A web-based **Library Management System** built with **Django**, **HTML**, and *
     python manage.py runserver
 Access the app
 Open your browser and go to: http://127.0.0.1:8000/
+
+username = librarian
+password = librarian123
