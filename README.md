@@ -1,0 +1,34 @@
+# 📚 Library Management System
+
+A web-based **Library Management System** built with **Django**, **HTML**, and **CSS** to help manage books, users, and borrowing activities efficiently.
+
+## 🚀 Features
+
+- Add, edit, and delete books
+- Issue and return books
+- User authentication (login/logout)
+- dashboard
+- Clean and responsive UI
+
+## 🛠️ Tech Stack
+
+- **Backend**: Django (Python)
+- **Frontend**: HTML, CSS 
+- **Database**: SQLite ORM (default with Django)
+
+## 📷 Screenshots
+![Homepage Screenshot](screenshots/Screnshot 1.png)
+
+*Add screenshots of the homepage, book list, and admin dashboard here.*
+
+## ⚙️ Installation & Setup
+
+ After download zip and extract zip in some folder ,now go to vs code and open terminal then for this step
+ ## Install dependencies
+    pip install django
+ ## Apply migrations
+    python manage.py migrate
+ ## Run the server
+    python manage.py runserver
+Access the app
+Open your browser and go to: http://127.0.0.1:8000/
