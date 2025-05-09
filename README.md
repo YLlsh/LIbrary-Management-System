@@ -17,7 +17,7 @@ A web-based **Library Management System** built with **Django**, **HTML**, and *
 - **Database**: SQLite ORM (default with Django)
 
 ## 📷 Screenshots
-![Homepage Screenshot](screenshots/Screnshot 1.png)
+![Login Page Screenshot](Screenshots/Screenshot 1.png)
 
 *Add screenshots of the homepage, book list, and admin dashboard here.*
 
