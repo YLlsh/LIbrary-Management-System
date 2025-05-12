@@ -31,11 +31,12 @@ A web-based **Library Management System** built with **Django**, **HTML**, and *
 ![Login Page Screenshot](Screenshots/Screenshot%206.png)  
 
 ## ⚙️ Installation & Setup
- After download zip and extract zip in some folder ,now go to vs code and open terminal then for this step
+ After download zip and extract zip in some folder ,now go to vs code and open terminal then follow this step
  
  ## Install dependencies
     pip install django
  ## Apply migrations
+    python manage.py makemigrations 
     python manage.py migrate
  ## Run the server
     python manage.py runserver
