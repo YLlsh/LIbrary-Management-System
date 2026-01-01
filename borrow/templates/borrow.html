@@ -181,8 +181,8 @@
                 {% endif %}
               </td>
               <td>
-                {% if borrow.return_date < today %} {{
-                borrow.calculate_penalty}} &#8377; {%endif%}
+                {% if borrow.return_date < today %} 
+                {{borrow.calculate_penalty}} &#8377; {%endif%}
               </td>
             </tr>
             {% endfor %}

@@ -131,13 +131,15 @@ def re_issue(request, id):
   
 @login_required(login_url="login")
 def add_book(request):
+    obj2 = book.objects.all()
+
     if request.method == "POST":
         book_name = request.POST.get('book_name')
         available = request.POST.get('available')
 
         book.objects.create(book_name=book_name, available=available)
         
-    return render(request, "add_book.html")
+    return render(request, "add_book.html",{'books':obj2})
 
 @login_required(login_url="login")
 
@@ -157,6 +159,7 @@ def add_student(request):
             contect = contect,
             email = email
         )
+        return redirect("add_student")
     return render(request,"add_student.html")
 
 @login_required(login_url="login")
