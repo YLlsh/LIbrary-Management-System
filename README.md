@@ -1,6 +1,7 @@
 #  Library Management System
 
 A web-based **Library Management System** built with **Django**, **HTML**, and **CSS** to help manage books, users, and borrowing activities efficiently.
+Its has chat bot that interact with database in help get easily data using less clicks. 
 
 ##  Features
 
@@ -8,6 +9,7 @@ A web-based **Library Management System** built with **Django**, **HTML**, and *
 - Issue and return books
 - User authentication (login/logout)
 - dashboard
+- Chat Bot
 - Clean and responsive UI
 
 ##  Tech Stack
