@@ -32,6 +32,7 @@ urlpatterns = [
     path('re_issue/<id>/', re_issue, name='re_issue'),
     path('student_info/',student_info, name='student_info'),
     path('borrow/',borrow, name='borrow' ),
+    path('chat_bot/',chat_bot, name='chat_bot' ),
     path('admin/', admin.site.urls),
 ]
 if settings.DEBUG:

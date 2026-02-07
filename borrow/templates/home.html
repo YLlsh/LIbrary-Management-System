@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Library Home</title>
+
     <style>
       html,
       body {
@@ -31,38 +32,26 @@
         z-index: 1000;
       }
 
-      .navbar .logo {
+      .logo {
         color: #ecf0f1;
         font-size: 22px;
         font-weight: bold;
-        text-transform: uppercase;
-      }
-
-      .navbar .nav-links {
-        display: flex;
       }
 
       .navbar a {
         color: #ecf0f1;
         text-decoration: none;
-        margin: 0 15px;
-        padding: 10px;
-        transition: background-color 0.3s;
-      }
-
-      .navbar a:hover {
-        background-color: #34495e;
-        border-radius: 4px;
+        margin-left: 15px;
       }
 
       /* Sidebar */
       .sidebar {
         width: 200px;
-        height: calc(100vh - 60px); /* Full height minus navbar */
+        height: calc(100vh - 60px);
         background-color: #2c3e50;
         padding-top: 20px;
         position: fixed;
-        top: 60px; /* below navbar */
+        top: 60px;
         left: 0;
       }
 
@@ -73,30 +62,17 @@
         margin: 10px;
         text-align: center;
         border-radius: 8px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-
-      .box:hover {
-        background-color: #1abc9c;
       }
 
       /* Main content */
       .main-content {
-        margin-left: 200px; /* width of sidebar */
-        margin-top: 60px; /* height of navbar */
-        width: calc(100% - 200px);
+        margin-left: 200px;
+        margin-top: 60px;
         height: calc(100vh - 60px);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        box-sizing: border-box;
-      }
-
-      h1 {
-        margin-bottom: 30px;
-        color: #333;
       }
 
       .button-container {
@@ -109,59 +85,185 @@
         padding: 15px;
         background-color: #4caf50;
         color: white;
-        border: none;
-        text-align: center;
         text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
         border-radius: 10px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
+        text-align: center;
       }
 
-      .btn:hover {
-        background-color: #45a049;
+      /* ================= CHATBOT ================= */
+
+      #chatbot-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #4caf50;
+        color: white;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 2000;
+      }
+
+      #chatbot-popup {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 300px;
+        height: 380px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        display: none;
+        flex-direction: column;
+        z-index: 2000;
+      }
+
+      .chat-header {
+        background: #2c3e50;
+        color: white;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .chat-body {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        font-size: 14px;
+      }
+
+      .chat-footer {
+        display: flex;
+        border-top: 1px solid #ddd;
+      }
+
+      .chat-footer input {
+        flex: 1;
+        padding: 8px;
+        border: none;
+        outline: none;
+      }
+
+      .chat-footer button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+      }
+
+      .user-msg {
+        text-align: right;
+        margin: 5px 0;
+      }
+
+      .bot-msg {
+        text-align: left;
+        margin: 5px 0;
+        color: #16a085;
       }
     </style>
   </head>
-  <body>
 
+  <body>
+    <!-- NAVBAR -->
     <div class="navbar">
       <div class="logo">Lexicon</div>
-      <div class="nav-links">
+      <div>
         <a href="#">Home</a>
         <a href="log_out">Logout</a>
       </div>
     </div>
 
- 
+    <!-- SIDEBAR -->
     <div class="sidebar">
-      <div class="box" style="background-color: #5dade2">
-        Borrow Books <br />
-        {{ borrow_books }}
-      </div>
-      <div class="box" style="background-color: #e74c3c">
-        Overdue Book <br />
-        {{ d }}
-      </div>
-      <div class="box" style="background-color: #58d68d">
-        Total Books <br />
-        {{ count_book }}
-      </div>
-      <div class="box" style="background-color: #f4d03f; color: #333">
-        Total Students <br />
-        {{ student_count }}
-      </div>
+      <div class="box">Borrow Books<br />{{ borrow_books }}</div>
+      <div class="box">Overdue Books<br />{{ d }}</div>
+      <div class="box">Total Books<br />{{ count_book }}</div>
+      <div class="box">Students<br />{{ student_count }}</div>
     </div>
-    <!-- Main content -->
+
+    <!-- MAIN -->
     <div class="main-content">
       <h1>Library Management</h1>
       <div class="button-container">
         <a href="/add_book/" class="btn">Add Book</a>
         <a href="/add_student/" class="btn">Add Student</a>
         <a href="/borrow/" class="btn">Borrow Book</a>
-        <a href="/student_info/" class="btn">Student And Book</a>
+        <a href="/student_info/" class="btn">Student & Book</a>
       </div>
     </div>
+
+    <!-- CHATBOT -->
+    <div id="chatbot-btn">💬</div>
+
+    <div id="chatbot-popup">
+      <div class="chat-header">
+        <span>Library Bot</span>
+        <button onclick="closeChat()">✖</button>
+      </div>
+
+      <div class="chat-body" id="chat-body">
+        <div class="bot-msg">Hello! Ask me anything 📚</div>
+      </div>
+
+      <div class="chat-footer">
+        <input type="text" name="user_input" id="chat-input" placeholder="Type..." />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <script>
+      const popup = document.getElementById("chatbot-popup");
+      const body = document.getElementById("chat-body");
+      const input = document.getElementById("chat-input");
+
+      document.getElementById("chatbot-btn").onclick = () =>
+        (popup.style.display = "flex");
+
+      function closeChat() {
+        popup.style.display = "none";
+      }
+
+      function sendMessage() {
+        let msg = input.value.trim();
+        if (!msg) return;
+
+        body.innerHTML += `<div class="user-msg">${msg}</div>`;
+        input.value = "";
+
+        fetch("chat_bot/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify({ message: msg }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log('hii123')
+            body.innerHTML += `<div class="bot-msg">${data.reply}</div>`;
+            body.scrollTop = body.scrollHeight;
+          });
+      }
+
+      function getCookie(name) {
+        let cookieValue = null;
+        document.cookie.split(";").forEach((cookie) => {
+          if (cookie.trim().startsWith(name + "=")) {
+            cookieValue = decodeURIComponent(
+              cookie.trim().substring(name.length + 1)
+            );
+          }
+        });
+        return cookieValue;
+      }
+    </script>
   </body>
 </html>
