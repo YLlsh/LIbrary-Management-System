@@ -24,14 +24,24 @@ urlpatterns = [
     path('',home, name='home' ),
     path('login/', log, name='login'),
     path('log_out', log_out, name='log_out'),
-    path('book/<id>/', b, name='b'),
+    path('book/<id>/', b, name='book'),
     path('student/<id>/', student, name='student'),
+
     path('add_student/', add_student, name='add_student'),
+    path('edit_student/<int:id>/', edit_student, name='edit_student'),
+    path('remove_student/<int:id>/', remove_student, name='remove_student'),
+
     path('add_book/', add_book, name='add_book'),
+    path('edit_book/<int:id>/', edit_book, name='edit_book'),
+    path('remove_book/<int:id>/', remove_book, name='remove_book'),
+
     path('delete/<id>/', return_book, name='delete_item'),
     path('re_issue/<id>/', re_issue, name='re_issue'),
     path('student_info/',student_info, name='student_info'),
+
     path('borrow/',borrow, name='borrow' ),
+    path('over_due/',over_due, name='over_due' ),
+
     path('chat_bot/',chat_bot, name='chat_bot' ),
     path('admin/', admin.site.urls),
 ]

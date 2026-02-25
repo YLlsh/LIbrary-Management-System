@@ -46,6 +46,7 @@ def home(request):
     count2 = Student.objects.aggregate(
         student_count=Count('student_id', filter=Q(student_id__isnull=False))
     )
+
     student_count = count2['student_count']
 
     count3 = book.objects.aggregate(
@@ -55,7 +56,9 @@ def home(request):
     count_book = count3['count_book']
 
     dates = borrow_book.objects.all()
+
     today = date.today()
+
     d = 0
     for r_date in dates:
         if r_date.return_date < today:
@@ -96,10 +99,12 @@ def borrow(request):
 
         return redirect('borrow')
 
+    books = book.objects.all()
+    students = Student.objects.all()
     obj1 = borrow_book.objects.all()
     today = date.today()
 
-    return render(request, "borrow.html", {'borrows': obj1, 'today': today})
+    return render(request, "borrow.html", {'borrows': obj1, 'today': today,"books":books, "students":students})
 
 
 @login_required(login_url="login")
@@ -150,31 +155,124 @@ def add_book(request):
 
     return render(request, "add_book.html", {'books': obj2})
 
+@login_required(login_url="login")
+def edit_book(request,id):
+    obj2 = book.objects.all()
+    book_obj = book.objects.get(id=id)
+
+    if request.method == "POST":
+        book_name = request.POST.get('book_name')
+        available = request.POST.get('available')
+
+        book_obj.book_name = book_name
+        book_obj.available = available
+        book_obj.save()
+
+        book.objects.create(book_name=book_name, available=available)
+
+    return render(request, "add_book.html", {'book_obj': book_obj,"isedit":True,'books': obj2})
+
+@login_required(login_url="login")
+def remove_book(request,id):
+    book_obj = book.objects.get(id=id)
+    book_obj.delete()
+
+    return redirect("add_book")
+
+
+
+import random
+import string
+def generate_studentId():
+    length = 6
+    studentId_str = ''.join(random.choices(string.digits, k=length))
+    studentId = int(studentId_str)
+    if Student.objects.filter(student_id = studentId).exists():
+        return generate_studentId
+    else:
+        return studentId
+   
+
+
+
 
 @login_required(login_url="login")
 def add_student(request):
     if request.method == "POST":
-        student_id = request.POST.get("student_id")
         name = request.POST.get("name")
         branch = request.POST.get("branch")
         contect = request.POST.get("contect")
         email = request.POST.get("email")
 
+        if Student.objects.filter(email=email).exists():
+            messages.error(request,"Email is already taken")
+            return redirect("add_student")
+        
+        if Student.objects.filter(contect=contect).exists():
+            messages.error(request,"Contact number is already taken")
+            return redirect("add_student")
+
         Student.objects.create(
-            student_id=student_id,
+            student_id=generate_studentId(),
             name=name,
             branch=branch,
             contect=contect,
             email=email
         )
         return redirect("add_student")
-    return render(request, "add_student.html")
+    obj1 = Student.objects.all().order_by('-create_time')
+    context = {'students': obj1}
+
+    return render(request, "add_student.html", context)
+
+
+@login_required(login_url="login")
+def edit_student(request,id):
+    student_obj = Student.objects.get(student_id = id)
+    if request.method == "POST":
+        name = request.POST.get("name")
+        branch = request.POST.get("branch")
+        contect = request.POST.get("contect")
+        email = request.POST.get("email")
+
+        if Student.objects.filter(email=email).exclude(student_id=id).exists():
+            messages.error(request,"Email is already taken")
+            return redirect("add_student")
+        
+        if Student.objects.filter(contect=contect).exclude(student_id=id).exists():
+            messages.error(request,"Contact number is already taken")
+            return redirect("add_student")
+        
+        
+        student_obj.name=name
+        student_obj.branch=branch
+        student_obj.contect=contect
+        student_obj.email=email
+        student_obj.save()
+
+        messages.error(request,"Student Edit Successfully")
+
+        return redirect("add_student")
+    
+    obj1 = Student.objects.all().order_by('-create_time')
+    context = {'students': obj1,'student_obj':student_obj,"isedit":True}
+
+    return render(request, "add_student.html", context)
+
+
+@login_required(login_url="login")
+def remove_student(request,id):
+    student_obj = Student.objects.get(student_id=id)
+    student_obj.delete()
+
+    messages.error(request,"Student is deleted successfully")
+
+    return redirect("add_student")
 
 
 @login_required(login_url="login")
 def student(request, id):
 
-    id = id
     obj = Student.objects.get(student_id=id)
 
     obj1 = history.objects.filter(student_id=id)
@@ -193,6 +291,14 @@ def b(request, id):
     context = {'book': obj}
 
     return render(request, "book.html", context)
+
+
+@login_required(login_url="login")
+def over_due(request):
+    today = date.today()
+    books = borrow_book.objects.filter(return_date__lte = today)
+
+    return render(request, 'borrow_list.html',{"borrows":books,"today":today})
 
 
 @csrf_exempt

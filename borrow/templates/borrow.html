@@ -1,194 +1,169 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8" />
-    <title>Hello, World!</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        margin: 0;
-        font-family: "Segoe UI", sans-serif;
-        background: #f0f2f5;
-        padding-top: 70px;
-      }
 
-      .navbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 60px;
-        background-color: #2c3e50;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 30px;
-        z-index: 1000;
-      }
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8" />
+  <title>Hello, World!</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #f0f2f5;
+      padding-top: 70px;
+    }
 
-      .navbar .logo {
-        color: #ecf0f1;
-        font-size: 22px;
-        font-weight: bold;
-        text-transform: uppercase;
-      }
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background-color: #2c3e50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 30px;
+      z-index: 1000;
+    }
 
-      .navbar .nav-links {
-        display: flex;
-      }
+    .navbar .logo {
+      color: #ecf0f1;
+      font-size: 22px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
 
-      .navbar a {
-        color: #ecf0f1;
-        text-decoration: none;
-        margin: 0 15px;
-        padding: 10px;
-        transition: background-color 0.3s;
-      }
+    .navbar .nav-links {
+      display: flex;
+    }
 
-      .navbar a:hover {
-        background-color: #34495e;
-        border-radius: 4px;
-      }
-      a {
-        color: #ffffff;
-        text-decoration: none;
-      }
+    .navbar a {
+      color: #ecf0f1;
+      text-decoration: none;
+      margin: 0 15px;
+      padding: 10px;
+      transition: background-color 0.3s;
+    }
 
-      a:hover {
-        color: #ffc107;
-        text-decoration: underline;
-      }
+    .navbar a:hover {
+      background-color: #34495e;
+      border-radius: 4px;
+    }
 
-      .btn {
-        margin: 2px;
-      }
-    </style>
-  </head>
+    a {
+      color: #ffffff;
+      text-decoration: none;
+    }
 
-  <body>
-    <div class="navbar">
-      <div class="logo">Lexicon</div>
-      <div class="nav-links">
-        <a href="/">Home</a>
-      </div>
+    a:hover {
+      color: #ffc107;
+      text-decoration: underline;
+    }
+
+    .btn {
+      margin: 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="navbar">
+    <div class="logo">Lexicon</div>
+    <div class="nav-links">
+      <a href="/">Home</a>
     </div>
+  </div>
 
-    <div class="container mt-5">
-      <form
-        class="col-12 mx-auto card p-3 shadow-lg"
-        method="POST"
-        enctype="multipart/form-data"
-      >
-        {% csrf_token %}
-        <h2>Library</h2>
+  <div class="container mt-5">
+    <form class="col-12 mx-auto card p-3 shadow-lg" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <h2>Library</h2>
+      <hr />
+
+      <div class="mb-3">
+        <label class="form-label">Book ID</label>
+        <select name="book_id" id="bookId"  class="form-control" required>
+          {% for book in books %}
+          <option value="" selected>Select Book</option>
+          <option value="{{book.id}}">{{book.book_name}}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Student ID</label>
+        <!-- <input type="text" name="student_id" required class="form-control" id="studentId" /> -->
+         <select name="student_id" id="student_id"  class="form-control" required>
+          {% for student in students %}
+          <option value="" selected>Select Student </option>
+          <option value="{{student.student_id}}">{{student.name}}</option>
+          {% endfor %}
+        </select>
+
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Issue Date</label>
+        <input type="date" name="issue_date" required class="form-control" id="issueDate" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Return Date</label>
+        <input type="date" name="return_date" required class="form-control" id="returnDate" />
+      </div>
+
+      <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+  </div>
+
+  <div class="container mt-4">
+    <div class="table-responsive">
+      <h2>
+        Borrow Book info
         <hr />
-
-        <div class="mb-3">
-          <label class="form-label">Book ID</label>
-          <input
-            type="text"
-            name="book_id"
-            required
-            class="form-control"
-            id="bookId"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Student ID</label>
-          <input
-            type="text"
-            name="student_id"
-            required
-            class="form-control"
-            id="studentId"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Issue Date</label>
-          <input
-            type="date"
-            name="issue_date"
-            required
-            class="form-control"
-            id="issueDate"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Return Date</label>
-          <input
-            type="date"
-            name="return_date"
-            required
-            class="form-control"
-            id="returnDate"
-          />
-        </div>
-
-        <button type="submit" class="btn btn-success">Submit</button>
-      </form>
-    </div>
-
-    <div class="container mt-4">
-      <div class="table-responsive">
-        <h2>
-          Borrow Book info
-          <hr />
-        </h2>
-        <table class="table table-dark table-bordered">
-          <thead>
-            <tr>
-              <th scope="col">Transaction ID</th>
-              <th scope="col">Book ID</th>
-              <th scope="col">Student ID</th>
-              <th scope="col">Issue Date</th>
-              <th scope="col">Return Date</th>
-              <th scope="col">Modifier</th>
-              <th scope="col">Status</th>
-              <th scope="col">Penalty</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for borrow in borrows %}
-            <tr>
-              <th scope="row">{{ forloop.counter }}</th>
-              <td>
-                <a href="/book/{{ borrow.book_id.id }}">{{ borrow.book_id }}</a>
-              </td>
-              <td>
-                <a href="/student/{{ borrow.student_id.student_id }}"
-                  >{{ borrow.student_id }}</a
-                >
-              </td>
-              <td>{{ borrow.issue_date }}</td>
-              <td>{{ borrow.return_date }}</td>
-              <td>
-                <a href="/delete/{{ borrow.id }}/" class="btn btn-success"
-                  >Return</a
-                >
-                <a href="/re_issue/{{ borrow.id }}/" class="btn btn-success"
-                  >Re-issue</a
-                >
-              </td>
-              <td>
-                {% if borrow.return_date < today %}
-                <a class="btn btn-danger">Date is gone</a>
+      </h2>
+      <table class="table table-dark table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Transaction ID</th>
+            <th scope="col">Book ID</th>
+            <th scope="col">Student ID</th>
+            <th scope="col">Issue Date</th>
+            <th scope="col">Return Date</th>
+            <th scope="col">Modifier</th>
+            <th scope="col">Status</th>
+            <th scope="col">Penalty</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for borrow in borrows %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>
+            <a href="{% url 'book' borrow.book_id.id %}">{{ borrow.book_id }}</a>
+            </td>
+            <td>
+              <a href="{% url 'student' borrow.student_id %}">{{ borrow.student_id }}</a>
+            </td>
+            <td>{{ borrow.issue_date }}</td>
+            <td>{{ borrow.return_date }}</td>
+            <td>
+              <a href="/delete/{{ borrow.id }}/" class="btn btn-success">Return</a>
+              <a href="/re_issue/{{ borrow.id }}/" class="btn btn-success">Re-issue</a>
+            </td>
+            <td>
+              {% if borrow.return_date < today %} <a class="btn btn-danger">Date is gone</a>
                 {% endif %}
-              </td>
-              <td>
-                {% if borrow.return_date < today %} 
-                {{borrow.calculate_penalty}} &#8377; {%endif%}
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+            </td>
+            <td>
+              {% if borrow.return_date < today %} {{borrow.calculate_penalty}} &#8377; {%endif%} </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-  </body>
+  </div>
+</body>
+
 </html>

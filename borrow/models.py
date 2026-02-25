@@ -15,6 +15,7 @@ class Student(models.Model):
     branch = models.CharField(max_length=30)
     contect = models.CharField(max_length=10)
     email = models.EmailField(max_length=300 ,unique=True)
+    create_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.student_id)

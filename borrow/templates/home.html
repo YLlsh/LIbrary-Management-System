@@ -167,6 +167,10 @@
         margin: 5px 0;
         color: #16a085;
       }
+
+      a { 
+        text-decoration: none;
+      }
     </style>
   </head>
 
@@ -183,7 +187,7 @@
     <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="box">Borrow Books<br />{{ borrow_books }}</div>
-      <div class="box">Overdue Books<br />{{ d }}</div>
+      <a href="{% url 'over_due' %}"><div class="box">Overdue Books<br />{{ d }}</div></a>
       <div class="box">Total Books<br />{{ count_book }}</div>
       <div class="box">Students<br />{{ student_count }}</div>
     </div>
