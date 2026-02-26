@@ -1,3 +1,6 @@
+from django.db.models import Sum
+import string
+import random
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
@@ -12,6 +15,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
+from django.contrib.admin.views.decorators import staff_member_required
+
 from langchain_community.llms import Ollama
 
 
@@ -22,8 +27,12 @@ def log(request):
 
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            login(request, user)
-            return redirect('home')
+            if user.is_staff:
+                login(request, user)
+                return redirect('home')
+            else:
+                login(request, user)
+                return redirect('student_home')
         else:
             messages.info(request, "username or password is wrong")
 
@@ -35,7 +44,7 @@ def log_out(request):
     return redirect('login')
 
 
-@login_required(login_url="login")
+@staff_member_required(login_url="login")
 def home(request):
     counts = borrow_book.objects.aggregate(
         filled_book_count=Count('book_id', filter=Q(book_id__isnull=False))
@@ -67,7 +76,7 @@ def home(request):
     return render(request, "home.html", {'borrow_books': book_count, 'd': d, 'student_count': student_count, 'count_book': count_book})
 
 
-@login_required(login_url="login")
+@staff_member_required(login_url="login")
 def borrow(request):
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
@@ -104,10 +113,10 @@ def borrow(request):
     obj1 = borrow_book.objects.all()
     today = date.today()
 
-    return render(request, "borrow.html", {'borrows': obj1, 'today': today,"books":books, "students":students})
+    return render(request, "borrow.html", {'borrows': obj1, 'today': today, "books": books, "students": students})
 
 
-@login_required(login_url="login")
+@staff_member_required(login_url="login")
 def student_info(request):
     obj1 = Student.objects.all()
     obj2 = book.objects.all()
@@ -127,7 +136,7 @@ def return_book(request, id):
     return redirect('borrow')
 
 
-@login_required(login_url="login")
+@staff_member_required(login_url="login")
 def re_issue(request, id):
     if request.method == "POST":
         issue_date = request.POST.get("issue_date")
@@ -143,7 +152,7 @@ def re_issue(request, id):
     return render(request, "re_issue.html")
 
 
-@login_required(login_url="login")
+@staff_member_required(login_url="login")
 def add_book(request):
     obj2 = book.objects.all()
 
@@ -155,8 +164,9 @@ def add_book(request):
 
     return render(request, "add_book.html", {'books': obj2})
 
-@login_required(login_url="login")
-def edit_book(request,id):
+
+@staff_member_required(login_url="login")
+def edit_book(request, id):
     obj2 = book.objects.all()
     book_obj = book.objects.get(id=id)
 
@@ -170,33 +180,28 @@ def edit_book(request,id):
 
         book.objects.create(book_name=book_name, available=available)
 
-    return render(request, "add_book.html", {'book_obj': book_obj,"isedit":True,'books': obj2})
+    return render(request, "add_book.html", {'book_obj': book_obj, "isedit": True, 'books': obj2})
 
-@login_required(login_url="login")
-def remove_book(request,id):
+
+@staff_member_required(login_url="login")
+def remove_book(request, id):
     book_obj = book.objects.get(id=id)
     book_obj.delete()
 
     return redirect("add_book")
 
 
-
-import random
-import string
 def generate_studentId():
     length = 6
     studentId_str = ''.join(random.choices(string.digits, k=length))
     studentId = int(studentId_str)
-    if Student.objects.filter(student_id = studentId).exists():
+    if Student.objects.filter(student_id=studentId).exists():
         return generate_studentId
     else:
         return studentId
-   
 
 
-
-
-@login_required(login_url="login")
+@staff_member_required(login_url="login")
 def add_student(request):
     if request.method == "POST":
         name = request.POST.get("name")
@@ -205,20 +210,34 @@ def add_student(request):
         email = request.POST.get("email")
 
         if Student.objects.filter(email=email).exists():
-            messages.error(request,"Email is already taken")
-            return redirect("add_student")
-        
-        if Student.objects.filter(contect=contect).exists():
-            messages.error(request,"Contact number is already taken")
+            messages.error(request, "Email is already taken")
             return redirect("add_student")
 
-        Student.objects.create(
+        if Student.objects.filter(contect=contect).exists():
+            messages.error(request, "Contact number is already taken")
+            return redirect("add_student")
+
+        student = Student.objects.create(
             student_id=generate_studentId(),
             name=name,
             branch=branch,
             contect=contect,
             email=email
         )
+        if name:
+            name = name.split()[0]
+
+        username_final = F'{name}{student.student_id}'
+        u = User(username=username_final)
+        u.email = email
+        u.set_password(f"{u.username}")
+        u.save()
+
+        user.objects.create(
+            user=u,
+            student=student
+        )
+
         return redirect("add_student")
     obj1 = Student.objects.all().order_by('-create_time')
     context = {'students': obj1}
@@ -226,9 +245,9 @@ def add_student(request):
     return render(request, "add_student.html", context)
 
 
-@login_required(login_url="login")
-def edit_student(request,id):
-    student_obj = Student.objects.get(student_id = id)
+@staff_member_required(login_url="login")
+def edit_student(request, id):
+    student_obj = Student.objects.get(student_id=id)
     if request.method == "POST":
         name = request.POST.get("name")
         branch = request.POST.get("branch")
@@ -236,41 +255,40 @@ def edit_student(request,id):
         email = request.POST.get("email")
 
         if Student.objects.filter(email=email).exclude(student_id=id).exists():
-            messages.error(request,"Email is already taken")
+            messages.error(request, "Email is already taken")
             return redirect("add_student")
-        
+
         if Student.objects.filter(contect=contect).exclude(student_id=id).exists():
-            messages.error(request,"Contact number is already taken")
+            messages.error(request, "Contact number is already taken")
             return redirect("add_student")
-        
-        
-        student_obj.name=name
-        student_obj.branch=branch
-        student_obj.contect=contect
-        student_obj.email=email
+
+        student_obj.name = name
+        student_obj.branch = branch
+        student_obj.contect = contect
+        student_obj.email = email
         student_obj.save()
 
-        messages.error(request,"Student Edit Successfully")
+        messages.error(request, "Student Edit Successfully")
 
         return redirect("add_student")
-    
+
     obj1 = Student.objects.all().order_by('-create_time')
-    context = {'students': obj1,'student_obj':student_obj,"isedit":True}
+    context = {'students': obj1, 'student_obj': student_obj, "isedit": True}
 
     return render(request, "add_student.html", context)
 
 
-@login_required(login_url="login")
-def remove_student(request,id):
+@staff_member_required(login_url="login")
+def remove_student(request, id):
     student_obj = Student.objects.get(student_id=id)
     student_obj.delete()
 
-    messages.error(request,"Student is deleted successfully")
+    messages.error(request, "Student is deleted successfully")
 
     return redirect("add_student")
 
 
-@login_required(login_url="login")
+@staff_member_required(login_url="login")
 def student(request, id):
 
     obj = Student.objects.get(student_id=id)
@@ -282,7 +300,7 @@ def student(request, id):
     return render(request, "student.html", context)
 
 
-@login_required(login_url="login")
+@staff_member_required(login_url="login")
 def b(request, id):
 
     id = id
@@ -293,12 +311,64 @@ def b(request, id):
     return render(request, "book.html", context)
 
 
+@staff_member_required(login_url="login")
+def over_due(request):
+    today = date.today()
+    books = borrow_book.objects.filter(return_date__lt=today)
+
+    return render(request, 'borrow_list.html', {"borrows": books, "today": today})
+
+
+@staff_member_required(login_url="login")
+def all_borrow(request):
+    today = date.today()
+    books = borrow_book.objects.all()
+
+    return render(request, 'borrow_list.html', {"borrows": books, "today": today})
+
+
 @login_required(login_url="login")
 def over_due(request):
     today = date.today()
-    books = borrow_book.objects.filter(return_date__lte = today)
+    # u = User.objects.filter(user=request.user.id).first()
+    user_obj = user.objects.filter(user=request.user).first()
 
-    return render(request, 'borrow_list.html',{"borrows":books,"today":today})
+    if request.user.is_staff:
+        books = borrow_book.objects.filter(return_date__lt=today)
+    else:
+        books = borrow_book.objects.filter(
+            Q(return_date__lt=today) and Q(student_id=user_obj.student))
+            # some issue in this code return all books of user
+
+    return render(request, 'borrow_list.html', {"borrows": books, "today": today})
+
+
+@login_required(login_url="login")
+def student_home(request):
+    user_obj = user.objects.filter(user=request.user).first()
+
+    borrow_count = borrow_book.objects.filter(
+        student_id=user_obj.student).count()
+
+    borrow_books = borrow_book.objects.filter(student_id=user_obj.student)
+
+    total_penalty = 0
+    for i in borrow_books:
+        total_penalty += i.calculate_penalty()
+
+    today = date.today()
+
+    current_borrow = borrow_books.count()
+    overdue_count = borrow_books.filter(return_date__lt=today).count()
+
+    context = {
+        "borrow_count": borrow_count,
+        "total_penalty": total_penalty,
+        "current_borrow": current_borrow,
+        "overdue_count": overdue_count
+    }
+
+    return render(request, "home_student.html", context)
 
 
 @csrf_exempt
@@ -319,7 +389,7 @@ def chat_bot(request):
                 status=400
             )
 
-        llm = Ollama(model="mistral:7b",temperature=0)
+        llm = Ollama(model="mistral:7b", temperature=0)
 
         db = SQLDatabase.from_uri("sqlite:///db.sqlite3")
 

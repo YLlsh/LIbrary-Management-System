@@ -171,6 +171,35 @@
       a { 
         text-decoration: none;
       }
+
+      .main-content{
+  margin-left:220px;
+  margin-top:60px;
+  height:calc(100vh - 60px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(2,250px);
+  gap:20px;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  text-align:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.2);
+}
+
+.card h2{
+  margin:10px 0;
+  color:#2c3e50;
+}
     </style>
   </head>
 
@@ -186,22 +215,44 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-      <a href="{% url 'all_borrow' %}"><div class="box">Borrow Books<br />{{ borrow_books }}</div></a>
-      <a href="{% url 'over_due' %}"><div class="box">Overdue Books<br />{{ d }}</div></a>
-      <div class="box">Total Books<br />{{ count_book }}</div>
+      <a href="{% url 'all_borrow' %}"><div class="box">Borrow Books<br /></div></a>
+      <a href="{% url 'over_due' %}"><div class="box">Overdue Books<br />{{ overdue_count }}</div></a>
+      <div class="box">History<br />{{ count_book }}</div>
       <div class="box">Students<br />{{ student_count }}</div>
     </div>
 
     <!-- MAIN -->
-    <div class="main-content">
-      <h1>Library Management</h1>
-      <div class="button-container">
-        <a href="/add_book/" class="btn">Add Book</a>
-        <a href="/add_student/" class="btn">Add Student</a>
-        <a href="/borrow/" class="btn">Borrow Book</a>
-        <a href="/student_info/" class="btn">Student & Book</a>
-      </div>
-    </div>
+   
+<!-- ================= MAIN BODY ================= -->
+<div class="main-content">
+
+<h1>Welcome {{ request.user }}</h1>
+
+<div class="dashboard-grid">
+
+  <div class="card">
+    <h3>📚 Books to Return Tomorrow</h3>
+    <h2>{% if borrow_count %}{{ borrow_count }}{% else %}0{% endif %}</h2>
+  </div>
+
+  <div class="card">
+    <h3>💰 Total Penalty</h3>
+    <h2>₹ {{ total_penalty }}</h2>
+  </div>
+
+  <div class="card">
+    <h3>✅ Books Currently Borrowed</h3>
+    <h2>{% if current_borrow %}{{ current_borrow }}{% else %}0{% endif %}</h2>
+  </div>
+
+  <div class="card">
+    <h3>📖 Recommended Books</h3>
+    <p>Check Library Collection</p>
+  </div>
+
+</div>
+
+</div>
 
     <!-- CHATBOT -->
     <div id="chatbot-btn">💬</div>
@@ -271,3 +322,4 @@
     </script>
   </body>
 </html>
+

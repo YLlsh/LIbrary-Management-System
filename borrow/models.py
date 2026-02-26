@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import date
 
+from django.contrib.auth.models import User
 class book(models.Model):
     id = models.IntegerField(primary_key=True)
     book_name = models.CharField(max_length=40)
@@ -20,6 +21,11 @@ class Student(models.Model):
     def __str__(self):
         return str(self.student_id)
     
+class user(models.Model):
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
+    student = models.ForeignKey(Student, on_delete = models.CASCADE)
+    
+
 from datetime import timedelta
 
 class borrow_book(models.Model):

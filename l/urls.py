@@ -40,7 +40,10 @@ urlpatterns = [
     path('student_info/',student_info, name='student_info'),
 
     path('borrow/',borrow, name='borrow' ),
+    path('all_borrow/',all_borrow, name='all_borrow' ),
     path('over_due/',over_due, name='over_due' ),
+
+    path('student_home/',student_home, name='student_home' ),
 
     path('chat_bot/',chat_bot, name='chat_bot' ),
     path('admin/', admin.site.urls),
