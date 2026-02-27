@@ -200,6 +200,10 @@
   margin:10px 0;
   color:#2c3e50;
 }
+a{
+  text-decoration: none;
+  color: black;
+}
     </style>
   </head>
 
@@ -208,17 +212,18 @@
     <div class="navbar">
       <div class="logo">Lexicon</div>
       <div>
-        <a href="#">Home</a>
-        <a href="log_out">Logout</a>
+        <a href="{% url 'student_home' %}">Home</a>
+        <a href="{% url 'profile' %}">Profile</a>
+        <a href="{% url 'log_out' %}">Logout</a>
       </div>
     </div>
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-      <a href="{% url 'all_borrow' %}"><div class="box">Borrow Books<br /></div></a>
+      <!-- <a href="{% url 'all_borrow' %}"><div class="box">Borrow Books<br /></div></a> -->
       <a href="{% url 'over_due' %}"><div class="box">Overdue Books<br />{{ overdue_count }}</div></a>
-      <div class="box">History<br />{{ count_book }}</div>
-      <div class="box">Students<br />{{ student_count }}</div>
+      <!-- <a href="#"><div class="box">History<br />{{ count_book }}</div></a> -->
+      <!-- <div class="box">Students<br />{{ student_count }}</div> -->
     </div>
 
     <!-- MAIN -->
@@ -229,26 +234,31 @@
 <h1>Welcome {{ request.user }}</h1>
 
 <div class="dashboard-grid">
-
+  <a href="{% url 'tomorrow_return' %}">
   <div class="card">
-    <h3>📚 Books to Return Tomorrow</h3>
-    <h2>{% if borrow_count %}{{ borrow_count }}{% else %}0{% endif %}</h2>
+    <h3>📚 Return Tomorrow</h3>
+    <h2>{% if tomorrow_return %}{{ tomorrow_return }}{% else %}0{% endif %}</h2>
   </div>
+  </a>
 
   <div class="card">
     <h3>💰 Total Penalty</h3>
     <h2>₹ {{ total_penalty }}</h2>
   </div>
 
+  <a href="{% url 'all_borrow' %}">
   <div class="card">
-    <h3>✅ Books Currently Borrowed</h3>
+    <h3>✅ Currently Borrowed</h3>
     <h2>{% if current_borrow %}{{ current_borrow }}{% else %}0{% endif %}</h2>
   </div>
+  </a>
 
+  <a href="{% url 'hostory' %}">
   <div class="card">
-    <h3>📖 Recommended Books</h3>
-    <p>Check Library Collection</p>
+    <h3>📖 History</h3>
+    <h2>{{history_count}} </h2>
   </div>
+  </a>
 
 </div>
 

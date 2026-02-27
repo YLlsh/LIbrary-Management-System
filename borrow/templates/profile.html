@@ -1,0 +1,363 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <title>My Profile</title>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: "Segoe UI", sans-serif;
+      background: #f0f2f5;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #2c3e50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 30px;
+    }
+
+    .logo {
+      color: #ecf0f1;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      margin-left: 15px;
+    }
+
+    /* MAIN CENTER */
+    .main-content {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* PROFILE CARD */
+    .profile-card {
+      background: white;
+      width: 400px;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, .2);
+      text-align: center;
+    }
+
+    .profile-card h2 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    .profile-info {
+      text-align: left;
+      margin: 15px 0;
+    }
+
+    .profile-info label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .profile-info p {
+      margin: 5px 0 10px;
+    }
+
+    /* BUTTON */
+    .btn {
+      display: block;
+      margin-top: 15px;
+      padding: 10px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .btn:hover {
+      background: #43a047;
+    }
+
+    /* CHATBOT SAME */
+    #chatbot-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #4caf50;
+      color: white;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    #chatbot-popup {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 300px;
+      height: 380px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .3);
+      display: none;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: #2c3e50;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    .chat-footer {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+
+    .chat-footer input {
+      flex: 1;
+      padding: 8px;
+      border: none;
+    }
+
+    .chat-footer button {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 25px;
+      width: 350px;
+      border-radius: 10px;
+      text-align: center;
+      position: relative;
+    }
+
+    .modal-content input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .close {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .profile-card{
+  background:white;
+  width:400px;
+  padding:30px;
+  border-radius:12px;
+  box-shadow:0 5px 20px rgba(0,0,0,.2);
+  text-align:center;
+  position:relative;   /* IMPORTANT */
+}
+
+/* BACK BUTTON */
+.back-btn{
+  position:absolute;
+  top:15px;
+  right:15px;
+  background:#3498db;
+  color:white;
+  padding:6px 12px;
+  border-radius:6px;
+  text-decoration:none;
+  font-size:14px;
+}
+
+.back-btn:hover{
+  background:#2980b9;
+}
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="logo">Lexicon</div>
+    <div>
+      <a href="{% url 'student_home' %}">Home</a>
+      <a href="{% url 'log_out' %}">Logout</a>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+<div class="main-content">
+
+  <div class="profile-card">
+      {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+
+    <div class="alert alert-danger" role="alert">
+      {{ message }}
+    </div>
+
+
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+    <!-- BACK BUTTON -->
+    <a href="javascript:history.back()" class="back-btn">
+      ← Back
+    </a>
+
+    <h2>My Profile</h2>
+
+    <div class="profile-info">
+      <label>Name</label>
+      <p>{{ request.user }}</p>
+    </div>
+
+    <div class="profile-info">
+      <label>Email</label>
+      <p>{{ request.user.email }}</p>
+    </div>
+
+    <div class="profile-info">
+      <label>Contact</label>
+      <p>{{ contact }}</p>
+    </div>
+
+    <a href="#" class="btn" onclick="openModal()">
+      Change Password
+    </a>
+
+  </div>
+</div>
+  <!-- PASSWORD MODAL -->
+  <div id="passwordModal" class="modal">
+
+    <div class="modal-content">
+      
+      <span class="close" onclick="closeModal()">✖</span>
+
+      <h3>Change Password</h3>
+
+      <form method="POST" action="{% url 'change_password' %}">
+        {% csrf_token %}
+
+        <input type="password" name="old" placeholder="Old Password" required>
+
+        <input type="password" name="new" placeholder="New Password" required>
+
+        <input type="password" name="confirm" placeholder="Confirm Password" required>
+
+        <button type="submit" class="btn">
+          Update Password
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+
+  <!-- CHATBOT BUTTON -->
+  <div id="chatbot-btn">💬</div>
+
+  <div id="chatbot-popup">
+    <div class="chat-header">
+      <span>Library Bot</span>
+      <button onclick="closeChat()">✖</button>
+    </div>
+
+    <div class="chat-body" id="chat-body">
+      <div>Hello! Ask me anything 📚</div>
+    </div>
+
+    <div class="chat-footer">
+      <input type="text" id="chat-input" placeholder="Type...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    function openModal() {
+      document.getElementById("passwordModal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("passwordModal").style.display = "none";
+    }
+
+    /* close if click outside */
+    window.onclick = function (e) {
+      let modal = document.getElementById("passwordModal");
+      if (e.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
+
+
+  <script>
+    const popup = document.getElementById("chatbot-popup");
+
+    document.getElementById("chatbot-btn").onclick =
+      () => popup.style.display = "flex";
+
+    function closeChat() {
+      popup.style.display = "none";
+    }
+  </script>
+
+</body>
+
+</html>

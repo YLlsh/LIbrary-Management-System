@@ -60,7 +60,13 @@
       </a>
       
       <h2>
+        {% if request.path == "/tomorrow_return/"%}
+        Tomorrow Returns Books
+       {% elif request.path == "/all_borrow/" %}
+        All Borrow
+         {% else %}
        Over Due Borrow Book info
+         {% endif %}
         <hr />
       </h2>
       
@@ -72,7 +78,9 @@
             <th scope="col">Student ID</th>
             <th scope="col">Issue Date</th>
             <th scope="col">Return Date</th>
+            {% if request.user.is_staff %}
             <th scope="col">Modifier</th>
+            {% endif %}
             <th scope="col">Status</th>
             <th scope="col">Penalty</th>
           </tr>
@@ -89,10 +97,12 @@
             </td>
             <td>{{ borrow.issue_date }}</td>
             <td>{{ borrow.return_date }}</td>
+            {% if request.user.is_staff %}
             <td>
               <a href="/delete/{{ borrow.id }}/" class="btn btn-success">Return</a>
               <a href="/re_issue/{{ borrow.id }}/" class="btn btn-success">Re-issue</a>
             </td>
+            {% endif %}
             <td>
               {% if borrow.return_date < today %} <a class="btn btn-danger">Date is gone</a>
                 {% endif %}

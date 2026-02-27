@@ -44,6 +44,11 @@ urlpatterns = [
     path('over_due/',over_due, name='over_due' ),
 
     path('student_home/',student_home, name='student_home' ),
+    path('hostory/',hostory, name='hostory' ),
+    path('tomorrow_return/',tomorrow_return, name='tomorrow_return' ),
+    
+    path('profile/',profile, name='profile' ),
+    path('change_password/',change_password, name='change_password' ),
 
     path('chat_bot/',chat_bot, name='chat_bot' ),
     path('admin/', admin.site.urls),

@@ -39,12 +39,45 @@ def log(request):
     return render(request, "login.html")
 
 
+@login_required(login_url="login")
+def profile(request):
+    user_data = user.objects.get(user=request.user)
+
+    student = Student.objects.filter(
+        student_id=user_data.student.student_id).first()
+
+    return render(request, "profile.html", {"user_data": user_data, "contact": student.contect
+                                            })
+
+def change_password(request):
+    if request.method == "POST":
+        old = request.POST.get("old")
+        new = request.POST.get("new")
+        confirm = request.POST.get("confirm")
+
+        u = request.user
+        user = authenticate(request,username = u.username, password = old)
+        if user is None:
+            messages.error(request,"Old passwprd is incorrect")
+            return redirect('profile')
+
+        if new != confirm:
+            messages.error(request,"New passwords do not match")
+            return redirect('profile')
+        u.set_password(new)
+        u.save()
+
+        messages.error(request,"Password changed successfully")
+
+        return redirect('profile')
+    
+    return render(request,"profile.html")
 def log_out(request):
     logout(request)
     return redirect('login')
 
 
-@staff_member_required(login_url="login")
+@login_required(login_url="login")
 def home(request):
     counts = borrow_book.objects.aggregate(
         filled_book_count=Count('book_id', filter=Q(book_id__isnull=False))
@@ -76,7 +109,7 @@ def home(request):
     return render(request, "home.html", {'borrow_books': book_count, 'd': d, 'student_count': student_count, 'count_book': count_book})
 
 
-@staff_member_required(login_url="login")
+@login_required(login_url="login")
 def borrow(request):
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
@@ -116,7 +149,7 @@ def borrow(request):
     return render(request, "borrow.html", {'borrows': obj1, 'today': today, "books": books, "students": students})
 
 
-@staff_member_required(login_url="login")
+@login_required(login_url="login")
 def student_info(request):
     obj1 = Student.objects.all()
     obj2 = book.objects.all()
@@ -136,7 +169,7 @@ def return_book(request, id):
     return redirect('borrow')
 
 
-@staff_member_required(login_url="login")
+@login_required(login_url="login")
 def re_issue(request, id):
     if request.method == "POST":
         issue_date = request.POST.get("issue_date")
@@ -152,7 +185,7 @@ def re_issue(request, id):
     return render(request, "re_issue.html")
 
 
-@staff_member_required(login_url="login")
+@login_required(login_url="login")
 def add_book(request):
     obj2 = book.objects.all()
 
@@ -165,7 +198,7 @@ def add_book(request):
     return render(request, "add_book.html", {'books': obj2})
 
 
-@staff_member_required(login_url="login")
+@login_required(login_url="login")
 def edit_book(request, id):
     obj2 = book.objects.all()
     book_obj = book.objects.get(id=id)
@@ -183,7 +216,7 @@ def edit_book(request, id):
     return render(request, "add_book.html", {'book_obj': book_obj, "isedit": True, 'books': obj2})
 
 
-@staff_member_required(login_url="login")
+@login_required(login_url="login")
 def remove_book(request, id):
     book_obj = book.objects.get(id=id)
     book_obj.delete()
@@ -288,7 +321,7 @@ def remove_student(request, id):
     return redirect("add_student")
 
 
-@staff_member_required(login_url="login")
+@login_required(login_url="login")
 def student(request, id):
 
     obj = Student.objects.get(student_id=id)
@@ -300,7 +333,7 @@ def student(request, id):
     return render(request, "student.html", context)
 
 
-@staff_member_required(login_url="login")
+@login_required(login_url="login")
 def b(request, id):
 
     id = id
@@ -311,7 +344,7 @@ def b(request, id):
     return render(request, "book.html", context)
 
 
-@staff_member_required(login_url="login")
+@login_required(login_url="login")
 def over_due(request):
     today = date.today()
     books = borrow_book.objects.filter(return_date__lt=today)
@@ -319,12 +352,41 @@ def over_due(request):
     return render(request, 'borrow_list.html', {"borrows": books, "today": today})
 
 
-@staff_member_required(login_url="login")
+@login_required(login_url="login")
 def all_borrow(request):
     today = date.today()
-    books = borrow_book.objects.all()
+    if request.user.is_staff:
+        books = borrow_book.objects.all()
+    else:
+        u = user.objects.filter(user = request.user).first()
+        books = borrow_book.objects.filter(student_id = u.student.student_id)
 
     return render(request, 'borrow_list.html', {"borrows": books, "today": today})
+
+
+# def all_borrow(request):
+#     today = date.today()
+#     books = borrow_book.objects.all()
+
+#     return render(request, 'borrow_list.html', {"borrows": books, "today": today})
+
+
+@login_required(login_url="login")
+def hostory(request):
+
+    if request.user.is_staff:
+        obj1 = history.objects.all()
+        context = {'historys': obj1}
+    else:
+        u = user.objects.filter(user=request.user).first()
+
+        obj = Student.objects.get(student_id=u.student.student_id)
+
+        obj1 = history.objects.filter(student_id=u.student.student_id)
+
+        context = {'student': obj, 'historys': obj1}
+
+    return render(request, "student.html", context)
 
 
 @login_required(login_url="login")
@@ -337,38 +399,54 @@ def over_due(request):
         books = borrow_book.objects.filter(return_date__lt=today)
     else:
         books = borrow_book.objects.filter(
-            Q(return_date__lt=today) and Q(student_id=user_obj.student))
-            # some issue in this code return all books of user
+            Q(return_date__lt=today) & Q(student_id=user_obj.student))
+        # some issue in this code return all books of user
 
     return render(request, 'borrow_list.html', {"borrows": books, "today": today})
 
 
 @login_required(login_url="login")
 def student_home(request):
+
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
+
     user_obj = user.objects.filter(user=request.user).first()
 
-    borrow_count = borrow_book.objects.filter(
-        student_id=user_obj.student).count()
-
     borrow_books = borrow_book.objects.filter(student_id=user_obj.student)
+
+    tomorrow_return = borrow_books.filter(return_date=tomorrow).count()
 
     total_penalty = 0
     for i in borrow_books:
         total_penalty += i.calculate_penalty()
 
-    today = date.today()
-
     current_borrow = borrow_books.count()
     overdue_count = borrow_books.filter(return_date__lt=today).count()
 
+    history_count = history.objects.filter(student_id=user_obj.student).count()
+
     context = {
-        "borrow_count": borrow_count,
+        "tomorrow_return": tomorrow_return,
         "total_penalty": total_penalty,
         "current_borrow": current_borrow,
-        "overdue_count": overdue_count
+        "overdue_count": overdue_count,
+        "history_count":history_count
     }
 
     return render(request, "home_student.html", context)
+
+
+def tomorrow_return(request):
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
+
+    u = user.objects.filter(user=request.user).first()
+
+    books = borrow_book.objects.filter(
+        Q(student_id=u.student.student_id) & Q(return_date=tomorrow))
+
+    return render(request, 'borrow_list.html', {"borrows": books, "today": today})
 
 
 @csrf_exempt
