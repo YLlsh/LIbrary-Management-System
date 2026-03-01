@@ -19,7 +19,11 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 from langchain_community.llms import Ollama
 
+from django.core.mail import EmailMessage
+from django.http import HttpResponse
+from django.conf import settings
 
+ 
 def log(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -49,6 +53,7 @@ def profile(request):
     return render(request, "profile.html", {"user_data": user_data, "contact": student.contect
                                             })
 
+
 def change_password(request):
     if request.method == "POST":
         old = request.POST.get("old")
@@ -56,22 +61,24 @@ def change_password(request):
         confirm = request.POST.get("confirm")
 
         u = request.user
-        user = authenticate(request,username = u.username, password = old)
+        user = authenticate(request, username=u.username, password=old)
         if user is None:
-            messages.error(request,"Old passwprd is incorrect")
+            messages.error(request, "Old passwprd is incorrect")
             return redirect('profile')
 
         if new != confirm:
-            messages.error(request,"New passwords do not match")
+            messages.error(request, "New passwords do not match")
             return redirect('profile')
         u.set_password(new)
         u.save()
 
-        messages.error(request,"Password changed successfully")
+        messages.error(request, "Password changed successfully")
 
         return redirect('profile')
-    
-    return render(request,"profile.html")
+
+    return render(request, "profile.html")
+
+
 def log_out(request):
     logout(request)
     return redirect('login')
@@ -100,7 +107,7 @@ def home(request):
     dates = borrow_book.objects.all()
 
     today = date.today()
-
+   
     d = 0
     for r_date in dates:
         if r_date.return_date < today:
@@ -265,6 +272,24 @@ def add_student(request):
         u.email = email
         u.set_password(f"{u.username}")
         u.save()
+        if u:
+            email = EmailMessage(
+                subject="Account created successfully",
+                body=f'''
+                        Hello {name},
+
+                        Your Account is created successfully at laxicom (Library Mangement System)
+                        This is your username:{u.username} and password: {u.username}
+
+                        Please do Change your password with first log in.
+
+                        Regards,
+                        Laxicon''',             
+                from_email= settings.EMAIL_HOST_USER,
+                to = [email]
+                
+            )
+            email.send()
 
         user.objects.create(
             user=u,
@@ -358,8 +383,8 @@ def all_borrow(request):
     if request.user.is_staff:
         books = borrow_book.objects.all()
     else:
-        u = user.objects.filter(user = request.user).first()
-        books = borrow_book.objects.filter(student_id = u.student.student_id)
+        u = user.objects.filter(user=request.user).first()
+        books = borrow_book.objects.filter(student_id=u.student.student_id)
 
     return render(request, 'borrow_list.html', {"borrows": books, "today": today})
 
@@ -431,7 +456,7 @@ def student_home(request):
         "total_penalty": total_penalty,
         "current_borrow": current_borrow,
         "overdue_count": overdue_count,
-        "history_count":history_count
+        "history_count": history_count
     }
 
     return render(request, "home_student.html", context)
